@@ -1,0 +1,5 @@
+# Match controller ancestry, never Linux ttyS/i2c adapter numbers.
+# configure_hat.py checks these controller paths against the selected base DTB.
+SUBSYSTEM=="tty", KERNEL=="ttyS*", KERNELS=="fe690000.serial", SYMLINK+="openchicken-dxl", GROUP="dialout", MODE="0660"
+SUBSYSTEM=="i2c-dev", KERNELS=="fe5d0000.i2c", SYMLINK+="i2c-openchicken i2c-pihat", GROUP="i2c", MODE="0660"
+SUBSYSTEM=="tty", KERNEL=="ttyS*", KERNELS=="fe6d0000.serial", SYMLINK+="openchicken-ext-uart9", GROUP="dialout", MODE="0660"

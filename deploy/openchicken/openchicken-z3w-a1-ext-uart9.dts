@@ -1,0 +1,28 @@
+/dts-v1/;
+/plugin/;
+
+/* Optional J7 UART9_M1, mutually exclusive with SPI3_M1. */
+/ {
+    compatible = "radxa,zero-3w", "rockchip,rk3566";
+    fragment@0 {
+        target = <&pinctrl>;
+        __overlay__ {
+            oc_ext_uart_pull: openchicken-ext-uart-pull { bias-pull-up; };
+            openchicken-ext-uart9 {
+                /* Pin21 TX GPIO4_C5; Pin24 RX GPIO4_C6; mux 4. */
+                oc_uart9m1: uart9m1 {
+                    rockchip,pins = <4 21 4 &oc_ext_uart_pull>, <4 22 4 &oc_ext_uart_pull>;
+                };
+            };
+        };
+    };
+    fragment@1 {
+        target = <&uart9>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&oc_uart9m1>;
+        };
+    };
+    fragment@2 { target = <&spi3>; __overlay__ { status = "disabled"; }; };
+};

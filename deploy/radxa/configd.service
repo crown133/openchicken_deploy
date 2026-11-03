@@ -1,0 +1,18 @@
+[Unit]
+Description=OpenChicken native configuration and Bluetooth pairing
+After=dbus.service bluetooth.service
+
+[Service]
+Type=exec
+# BlueZ changes use the native privileged config service; CLI callers stay unprivileged.
+User=root
+Group=openchicken1
+ExecStart=/home/openchicken1/openchicken_deploy/current/bin/configd --socket /run/configd/configd.sock --state-dir /home/openchicken1/openchicken_deploy/state/configd --allow-user openchicken1
+RuntimeDirectory=configd
+Restart=always
+RestartSec=2s
+NoNewPrivileges=yes
+Environment=RUST_LOG=info
+
+[Install]
+WantedBy=multi-user.target

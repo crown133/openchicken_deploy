@@ -1,0 +1,20 @@
+[Unit]
+Description=OpenChicken unified Bluetooth gamepad client
+After=robotd.service bluetooth.service
+
+[Service]
+Type=exec
+User=openchicken1
+Group=openchicken1
+SupplementaryGroups=input
+WorkingDirectory=/home/openchicken1/openchicken_deploy/current
+ExecCondition=/home/openchicken1/openchicken_deploy/current/bin/padd --config /home/openchicken1/openchicken_deploy/config/robotd.toml --should-run
+ExecStart=/home/openchicken1/openchicken_deploy/current/bin/padd --socket /run/robotd/robotd.sock --config /home/openchicken1/openchicken_deploy/config/robotd.toml --tap-socket /run/padd/pad.sock
+RuntimeDirectory=padd
+Restart=always
+RestartSec=5s
+NoNewPrivileges=yes
+Environment=RUST_LOG=info
+
+[Install]
+WantedBy=multi-user.target

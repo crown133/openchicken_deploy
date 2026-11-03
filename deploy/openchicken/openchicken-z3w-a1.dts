@@ -1,0 +1,87 @@
+/dts-v1/;
+/plugin/;
+
+/* OpenChicken Z3W-A1: all Pin numbers below are J4 physical numbers.
+ * Pinmux checked against armbian/linux-rockchip 85233a85b67928000afc2e966bab86a8c414f1b4.
+ * Enable controllers only: no PWM export, GPIO writes, EEPROM writes or motor packets.
+ * BMI088 remains available to a userspace reader through i2c-dev; do not bind an
+ * unrelated IMU driver or pretend the stock body IMU's DXL protocol is compatible.
+ */
+/ {
+    compatible = "radxa,zero-3w", "rockchip,rk3566";
+
+    fragment@0 {
+        target = <&pinctrl>;
+        __overlay__ {
+            oc_no_pull: openchicken-no-pull { bias-disable; };
+            oc_i2c_input: openchicken-i2c-input {
+                bias-disable;
+                input-schmitt-enable;
+            };
+            oc_uart_pull: openchicken-uart-pull { bias-pull-up; };
+            openchicken-hat {
+                /* GPIO4_B2/B3, mux 1: SDA Pin27 / SCL Pin28. */
+                oc_i2c4m0: i2c4m0 {
+                    rockchip,pins = <4 10 1 &oc_i2c_input>, <4 11 1 &oc_i2c_input>;
+                };
+                /* GPIO3_C2/C3, mux 4: TX Pin32 / RX Pin33. */
+                oc_uart5m1: uart5m1 {
+                    rockchip,pins = <3 18 4 &oc_uart_pull>, <3 19 4 &oc_uart_pull>;
+                };
+                /* GPIO3_B1/B2, mux 5: PWM8 Pin16 / PWM9 Pin18. */
+                oc_pwm8m0: pwm8m0 { rockchip,pins = <3 9 5 &oc_no_pull>; };
+                oc_pwm9m0: pwm9m0 { rockchip,pins = <3 10 5 &oc_no_pull>; };
+                /* Pin12 BCLK, Pin35 LRCLK, Pin38 SDI, Pin40 SDO.
+                 * No MCLK pin is claimed: the HAT clock source still needs validation.
+                 */
+                oc_i2s3m0: i2s3m0 {
+                    rockchip,pins = <3 3 4 &oc_no_pull>, <3 4 4 &oc_no_pull>,
+                                    <3 6 4 &oc_no_pull>, <3 5 4 &oc_no_pull>;
+                };
+            };
+        };
+    };
+    fragment@1 {
+        target = <&i2c4>;
+        __overlay__ {
+            status = "okay";
+            clock-frequency = <100000>;
+            pinctrl-names = "default";
+            pinctrl-0 = <&oc_i2c4m0>;
+        };
+    };
+    fragment@2 {
+        target = <&uart5>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&oc_uart5m1>;
+        };
+    };
+    fragment@3 {
+        target = <&pwm8>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "active";
+            pinctrl-0 = <&oc_pwm8m0>;
+        };
+    };
+    fragment@4 {
+        target = <&pwm9>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "active";
+            pinctrl-0 = <&oc_pwm9m0>;
+        };
+    };
+    /* UART4 must not take Pin16/18 from PWM8/9. UART2 is left untouched. */
+    fragment@5 { target = <&uart4>; __overlay__ { status = "disabled"; }; };
+    fragment@6 {
+        target = <&i2s3_2ch>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&oc_i2s3m0>;
+        };
+    };
+};

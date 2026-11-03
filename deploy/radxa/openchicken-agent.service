@@ -1,0 +1,18 @@
+[Unit]
+Description=OpenChicken runtime monitor bridge
+Wants=robotd.service tofd.service
+After=local-fs.target robotd.service tofd.service
+
+[Service]
+Type=exec
+# The existing Pin31 opener acquires an input fd, drops to openchicken1, then execs the agent.
+User=root
+WorkingDirectory=/home/openchicken1/openchicken_deploy/current/console
+ExecStart=/usr/bin/python3 -I /usr/local/lib/openchicken/open_runtime_pin31.py
+Restart=always
+RestartSec=2s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,21 @@
+[Unit]
+Description=OpenChicken robot control daemon
+After=local-fs.target
+
+[Service]
+Type=exec
+User=openchicken1
+Group=openchicken1
+WorkingDirectory=/home/openchicken1/openchicken_deploy/current
+ExecStart=/home/openchicken1/openchicken_deploy/current/bin/robotd --params /home/openchicken1/openchicken_deploy/config/robotd.toml --socket /run/robotd/robotd.sock --vetbook /home/openchicken1/openchicken_deploy/state/vetbook.json
+Environment=ORT_DYLIB_PATH=/home/openchicken1/openchicken_deploy/deps/onnxruntime-linux-aarch64-1.28.0/lib/libonnxruntime.so.1.28.0
+Environment=RUST_LOG=info
+RuntimeDirectory=robotd
+Restart=always
+RestartSec=2s
+NoNewPrivileges=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

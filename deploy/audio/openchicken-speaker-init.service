@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenChicken AIC3104 playback levels and MK1 capture routing
+After=sound.target alsa-restore.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /usr/local/share/openchicken/audio/aic3104-speaker-init.sh
+ExecStartPost=/bin/sh /usr/local/share/openchicken/audio/aic3104-mic-init.sh
+TimeoutStartSec=25
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

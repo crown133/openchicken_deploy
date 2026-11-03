@@ -1,0 +1,32 @@
+/dts-v1/;
+/plugin/;
+
+/* Optional J7 SPI3_M1. No invented spidev-compatible or slave is declared:
+ * a real peripheral needs its own binding, chip select and maximum frequency.
+ */
+/ {
+    compatible = "radxa,zero-3w", "rockchip,rk3566";
+    fragment@0 {
+        target = <&pinctrl>;
+        __overlay__ {
+            oc_ext_spi_pull: openchicken-ext-spi-pull { bias-disable; };
+            openchicken-ext-spi3 {
+                /* Pin23 CLK C2; Pin21 MISO C5; Pin19 MOSI C3; Pin24 CS0 C6. */
+                oc_spi3m1: spi3m1 {
+                    rockchip,pins = <4 18 2 &oc_ext_spi_pull>, <4 21 2 &oc_ext_spi_pull>,
+                                    <4 19 2 &oc_ext_spi_pull>, <4 22 2 &oc_ext_spi_pull>;
+                };
+            };
+        };
+    };
+    fragment@1 {
+        target = <&spi3>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default", "high_speed";
+            pinctrl-0 = <&oc_spi3m1>;
+            pinctrl-1 = <&oc_spi3m1>;
+        };
+    };
+    fragment@2 { target = <&uart9>; __overlay__ { status = "disabled"; }; };
+};

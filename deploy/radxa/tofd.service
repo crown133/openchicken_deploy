@@ -1,0 +1,20 @@
+[Unit]
+Description=OpenChicken head IMU daemon
+After=local-fs.target
+
+[Service]
+Type=exec
+User=openchicken1
+Group=openchicken1
+WorkingDirectory=/home/openchicken1/openchicken_deploy/current
+ExecStart=/home/openchicken1/openchicken_deploy/current/bin/tofd --config /home/openchicken1/openchicken_deploy/config/robotd.toml --socket /run/tofd/tofd.sock --imu-only --imu-hz 50 --bus /dev/i2c-openchicken
+Environment=RUST_LOG=info
+RuntimeDirectory=tofd
+Restart=always
+RestartSec=5s
+NoNewPrivileges=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
